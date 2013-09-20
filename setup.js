@@ -1,9 +1,9 @@
 "use strict";
 
 (function() {
-    var reaperEnters = { from: 4*60+10  , to: 4*60+30, text: 'reaper expand arrives', css: 'scout' };
-    var scv9Scout    = { from: 1*60     , to: 1*60+20, text:  '9 SCV scout arrives', css: 'scout' };
-    var scv13Scout   = { from: 2*60     , to: 2*60+20, text: '13 SCV scout arrives', css: 'scout' };
+    var reaperEnters = { from: "4:10", to: "4:30", text: 'reaper expand arrives', css: 'scout' };
+    var scv9Scout    = { from: "1:00", to: "1:20", text:  '9 SCV scout arrives' , css: 'scout' };
+    var scv13Scout   = { from: "2:00", to: "2:20", text: '13 SCV scout arrives' , css: 'scout' };
 
     starcraft.sections({
             TvP: function(build) {
@@ -13,14 +13,14 @@
                         reaperEnters,
 
                         {
-                            at: 60+40,
+                            at: "1:40",
                             text: '1 proxy gateway',
                             css: 'pressure',
                             info: 'pull 5 SCVs, or 6 if there is a delay, and surround gateway',
 
                             points: [
                                 {
-                                    at: 60+60,
+                                    at: "2:03",
                                     text: '2nd proxy gateway',
                                     css: 'all-in',
                                     info: 'pull 8 to 10 SCVs, and surround 1st gateway'
@@ -29,16 +29,18 @@
                         },
 
                         {
-                            at: 3*60 + 40,
-                            text: 'late 2nd pylon',
+                            at: "3:40",
+                            text: 'late 2nd Pylon',
                             css: 'aggressive',
+
                             points: {
-                                text: 'proxy 1 gas Pylon'
+                                text: 'proxy 1 gas Pylon',
+                                css: 'aggressive'
                             }
                         },
 
                         {
-                            at: 2*60 + 10,
+                            at: "2:10",
                             text: 'fast 2 gas',
                             css: 'look-for',
 
@@ -49,59 +51,61 @@
                         },
 
                         {
-                            at: 4*60,
+                            at: "4:10",
                             text: '1 gas',
                             css: 'look-for',
 
                             points: [
-                                    'chrono-warpgate',
-                                    'Gateway expand'
+                                    {
+                                        text: 'Chronoboost Cybernetics Core',
+                                        css: 'aggressive',
+                                        points: 'Gateway pressure'
+                                    },
+
+                                    {
+                                        at: "4:30",
+                                        text: 'Nexus',
+                                        css: 'macro',
+
+                                        points: {
+                                            at: "8:00",
+                                            text: 'macro',
+                                            css: 'macro'
+                                        }
+                                    }
                             ]
                         },
 
                         {
-                            at: 4*60 + 30,
-                            text: 'Nexus',
-                            points: 'macro',
-                            css: 'macro'
+                            at: "5:10",
+                            text: "delayed Nexus",
+                            css: "aggressive",
+                            info: "The nexus is delayed, as Protoss has spent money on gateways or tech, before building it",
+
+                            points: {
+                                at: "6:15",
+                                text: 'Oracle pressure!',
+                                css: 'pressure'
+                            }
                         },
 
                         {
-                            at: 4*60 + 30,
+                            at: "4:20",
                             text: 'Stargate',
                             css: 'aggressive',
 
                             points: [
-                                    {
-                                        at: 6*60 + 45,
-                                        text: 'Oracle!'
-                                    },
-                                    'Phoenix',
-                                    'Void Ray'
-                            ]
-                        },
+                                    "Oracle prssure!",
 
-                        {
-                            at: 4*60 + 25,
-                            text: 'proxy Stargate',
-                            css: 'aggressive',
-
-                            points: [
                                     {
-                                        at: 5*60,
+                                        at: "5:00",
                                         text: '3 Gateways',
                                         css: 'look-for',
 
                                         points: {
-                                            at: 6*60 + 15,
-                                            text: 'proxy Oracle!',
-                                            css: 'pressure',
-
-                                            points: {
-                                                at: 6*60 + 50,
-                                                text: '3 Gateway / Oracle',
-                                                css: 'all-in'
-                                            }
+                                            at: "6:50",
+                                            text: '3 Gate Oracle',
+                                            css: 'all-in'
                                         }
                                     }
                             ]
@@ -112,12 +116,7 @@
 
                             text: 'proxy pylon',
                             points: [
-                                    {
-                                        text: 'proxy Stargate',
-                                        points: {
-                                            text: 'Oracles!',
-                                        }
-                                    },
+                                    'proxy Stargate',
 
                                     {
                                         text: 'proxy Twilight Council',
@@ -138,11 +137,6 @@
                             at: 4*60 + 20,
                             text: 'stalker before 2nd pylon',
                             points: 'proxy pylon'
-                        },
-
-                        {
-                            at: 8*60,
-                            text: 'macro'
                         }
                 );
             },

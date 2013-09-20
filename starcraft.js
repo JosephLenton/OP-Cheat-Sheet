@@ -2,10 +2,11 @@
 
 var starcraft = window['starcraft'] = (function() {
     var TIMELINE_Y_INC = 30,
+        TIMELINE_Y_START = 60,
         TIMELINE_TIME_INC = 45;
 
     var TIMELINE_CLOSE_TIME_CUTOFF = 39,
-        TIMELINE_CLOSE_TIME_Y_INC = 180;
+        TIMELINE_CLOSE_TIME_Y_INC = 45;
 
     var TIME_TO_POSITION_MULT = 4;
 
@@ -44,6 +45,23 @@ var starcraft = window['starcraft'] = (function() {
         return html;
     }
 
+    var parseTime = function( time ) {
+        if ( typeof time === 'string' ) {
+            if ( time.indexOf(':') !== -1 ) {
+                var parts = time.split( ':' );
+                return parseInt(parts[0])*60 + parseInt(parts[1]);
+            } else {
+                return time|0;
+            }
+        } else {
+            return time;
+        }
+    }
+
+    var timeToWidth = function( n ) {
+        return parseTime(n)*TIME_TO_POSITION_MULT;
+    }
+
     var sections = [];
 
     window.onload = function() {
@@ -76,18 +94,16 @@ var starcraft = window['starcraft'] = (function() {
                 var line = newDiv( 'starcraft-timeline-connection' );
 
                 var fromX = from.offsetLeft;
-                var fromY = from.offsetTop;
+                var fromY = from.offsetTop + from.offsetHeight*0.48;
                 var toX = to.offsetLeft;
-                var toY = to.offsetTop + (to.offsetHeight/4)*3;
+                var toY = to.offsetTop + to.offsetHeight*0.48;
 
                 var width = toX - fromX;
                 var height = toY - fromY;
 
                 var hypot = Math.sqrt( width*width + height*height ) - 120;
 
-                if ( width === 1100 ) {
-                    console.log( from.querySelector('div').textContent );
-                    console.log( to.querySelector('div').textContent );
+                if ( from.firstChild.textContent === "late 2nd pylon" ) {
                 }
 
                 line.style.width = hypot + 'px';
@@ -118,15 +134,23 @@ var starcraft = window['starcraft'] = (function() {
                 seenItems[item.name || item.text] = itemDiv;
             }
 
+            var hasYInc = false;
+            if ( item.yInc ) {
+                yPosition += item.yInc;
+                hasYInc = true;
+            }
+
             if ( item.at ) {
-                if ( item.at-lastTime < TIMELINE_CLOSE_TIME_CUTOFF ) {
+                var at = parseTime( item.at );
+
+                if ( lastTime !== 0 && (at-lastTime) < TIMELINE_CLOSE_TIME_CUTOFF && ! hasYInc ) {
                     yPosition += TIMELINE_CLOSE_TIME_Y_INC;
                 }
 
-                lastTime = timeToWidth( item.at );
-                itemDiv.style.left = lastTime + 'px';
+                lastTime = at;
+                itemDiv.style.left = timeToWidth( lastTime ) + 'px';
             } else {
-                itemDiv.style.left = lastTime + timeToWidth( TIMELINE_TIME_INC ) + 'px';
+                itemDiv.style.left = timeToWidth( lastTime ) + timeToWidth( TIMELINE_TIME_INC ) + 'px';
             }
 
             itemDiv.style.top = yPosition + 'px';
@@ -137,7 +161,7 @@ var starcraft = window['starcraft'] = (function() {
 
             if ( item.points ) {
                 if ( item.points instanceof Array ) {
-                    var points = [];
+                    var laterPs = [];
 
                     for ( var i = 0; i < item.points.length; i++ ) {
                         var pointItem = item.points[i];
@@ -145,16 +169,19 @@ var starcraft = window['starcraft'] = (function() {
                         if ( pointItem instanceof Object ) {
                             yPosition = addTimelineItem( div, pointItem, lastTime, yPosition, seenItems, laterPoints );
                             dontIncrementY = true;
+
+                            laterPs.push( pointItem.name || pointItem.text );
                         } else {
-                            points.push( item.points[i] );
+                            laterPs.push( pointItem );
                         }
                     }
 
-                    if ( points.length > 0 ) {
-                        laterPoints.push({ points: item.points, div: itemDiv });
-                    }
+                    laterPoints.push({ points: laterPs, div: itemDiv });
                 } else if ( item.points instanceof Object ) {
-                    addTimelineItem( div, item.points, lastTime, yPosition, seenItems, laterPoints );
+                    yPosition = addTimelineItem( div, item.points, lastTime, yPosition, seenItems, laterPoints );
+                    dontIncrementY = true;
+
+                    laterPoints.push({ points: (item.points.name || item.points.text), div: itemDiv });
                 } else {
                     laterPoints.push({ points: item.points, div: itemDiv });
                 }
@@ -165,10 +192,6 @@ var starcraft = window['starcraft'] = (function() {
             } else {
                 return yPosition + TIMELINE_Y_INC;
             }
-        }
-
-        var timeToWidth = function( n ) {
-            return n*TIME_TO_POSITION_MULT;
         }
 
         var builder = {
@@ -183,8 +206,7 @@ var starcraft = window['starcraft'] = (function() {
                         var seenItems = {};
                         var laterPoints = [];
 
-                        var lastTime = 0;
-                        var yPosition = TIMELINE_Y_INC;
+                        var yPosition = TIMELINE_Y_START;
 
                         iterate( args, 2, function(item) {
                             if ( item.from !== undefined && item.to !== undefined ) {
@@ -192,11 +214,11 @@ var starcraft = window['starcraft'] = (function() {
                                 timeMark.textContent = item.text;
 
                                 timeMark.style.left = timeToWidth(item.from) + 'px';
-                                timeMark.style.width = timeToWidth(item.to-item.from) + 'px';
+                                timeMark.style.width = (timeToWidth(item.to) - timeToWidth(item.from)) + 'px';
 
                                 div.appendChild( timeMark );
                             } else {
-                                yPosition = addTimelineItem( div, item, lastTime, yPosition, seenItems, laterPoints ) + TIMELINE_Y_INC;
+                                yPosition = addTimelineItem( div, item, 0, yPosition, seenItems, laterPoints ) + TIMELINE_Y_INC;
                             }
                         } );
 

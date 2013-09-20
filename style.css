@@ -110,6 +110,8 @@ html, body, .main {
             width: 0;
 
             border-top: 4px dashed #666;
+
+            z-index: 10;
         }
         .starcraft-timeline-mark,
         .starcraft-timeline-item {
@@ -121,8 +123,11 @@ html, body, .main {
             min-height: 100%;
             padding: 18px 12px 0 12px;
             color: black;
+
+            z-index: 0;
         }
         .starcraft-timeline-item {
+            z-index: 20;
         }
             .starcraft-timeline-item-content {
                 background: #aaa;
